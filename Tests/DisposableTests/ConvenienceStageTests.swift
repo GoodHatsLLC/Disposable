@@ -6,15 +6,15 @@ import XCTest
 @MainActor
 final class ConvenienceStageTests: XCTestCase {
 
-    func test_stageOne_disposesOnRestage() throws {
+    func test_stageOne_disposesOnRestage() async throws {
         var didFire = false
-        AnyDisposable {
+        await AnyDisposable {
             didFire = true
         }
         .stageOne(by: "LOL")
         XCTAssertFalse(didFire)
 
-        AnyDisposable {}.stageOne(by: "LOL")
+        await AnyDisposable {}.stageOne(by: "LOL")
 
         // The two stage keys are the same so the second
         // staged disposable replaces the first and the first
@@ -22,15 +22,15 @@ final class ConvenienceStageTests: XCTestCase {
         XCTAssert(didFire)
     }
 
-    func test_stageOne_doesNotDisposesForOtherIdentifier() throws {
+    func test_stageOne_doesNotDisposesForOtherIdentifier() async throws {
         var didFire = false
-        AnyDisposable {
+        await AnyDisposable {
             didFire = true
         }
         .stageOne(by: "LOL")
 
         XCTAssertFalse(didFire)
-        AnyDisposable {}
+        await AnyDisposable {}
             .stageOne(by: "ROFL")
 
         // The two stage keys are different so the initially
@@ -38,15 +38,15 @@ final class ConvenienceStageTests: XCTestCase {
         XCTAssertFalse(didFire)
     }
 
-    func test_stageOne_doesNotDispose_onCallAtOtherLocation() throws {
+    func test_stageOne_doesNotDispose_onCallAtOtherLocation() async throws {
         var didFire = false
-        AnyDisposable {
+        await AnyDisposable {
             didFire = true
         }
         // Line A
         .stageOneByLocation()
         XCTAssertFalse(didFire)
-        AnyDisposable {}
+        await AnyDisposable {}
             // Line B
             .stageOneByLocation()
 
@@ -56,19 +56,19 @@ final class ConvenienceStageTests: XCTestCase {
         XCTAssertFalse(didFire)
     }
 
-    func test_stageOne_disposes_onRepeatCallAtSameLocation() throws {
+    func test_stageOne_disposes_onRepeatCallAtSameLocation() async throws {
         var didFire = false
-        func call() {
-            AnyDisposable {
+        func call() async  {
+            await AnyDisposable {
                 didFire = true
             }
             // This line is executed twice and the source
             // code identity is used as the stage key.
             .stageOneByLocation()
         }
-        call()
+        await call()
         XCTAssertFalse(didFire)
-        call()
+        await call()
         XCTAssert(didFire)
     }
 

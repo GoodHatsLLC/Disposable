@@ -9,7 +9,6 @@ extension AnyCancellable: Disposable {
 
 extension Combine.Cancellable {
     @_disfavoredOverload
-    @MainActor
     public func erase() -> AnyDisposable {
         AnyDisposable { self.cancel() }
     }

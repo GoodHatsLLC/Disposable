@@ -2,7 +2,7 @@
 
 extension Disposable {
     public func erase() -> AnyDisposable {
-        AnyDisposable { dispose() }
+        AnyDisposable { await dispose() }
     }
 
     public func eraseToDisposable() -> AnyDisposable {
