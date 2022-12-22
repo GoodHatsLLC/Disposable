@@ -1,7 +1,7 @@
 #if canImport(Combine)
 import Combine
 
-extension AnyCancellable: Disposable {
+extension AnyCancellable: AsyncDisposable {
     public func dispose() {
         cancel()
     }

@@ -6,15 +6,15 @@ import XCTest
 @MainActor
 final class ConvenienceStageTests: XCTestCase {
 
-    func test_stageOne_disposesOnRestage() async throws {
+    func test_stageOne_disposesOnRestage() throws {
         var didFire = false
-        await AnyDisposable {
+        AnyDisposable {
             didFire = true
         }
         .stageOne(by: "LOL")
         XCTAssertFalse(didFire)
 
-        await AnyDisposable {}.stageOne(by: "LOL")
+        AnyDisposable {}.stageOne(by: "LOL")
 
         // The two stage keys are the same so the second
         // staged disposable replaces the first and the first
@@ -24,13 +24,13 @@ final class ConvenienceStageTests: XCTestCase {
 
     func test_stageOne_doesNotDisposesForOtherIdentifier() async throws {
         var didFire = false
-        await AnyDisposable {
+        AnyDisposable {
             didFire = true
         }
         .stageOne(by: "LOL")
 
         XCTAssertFalse(didFire)
-        await AnyDisposable {}
+        AnyDisposable {}
             .stageOne(by: "ROFL")
 
         // The two stage keys are different so the initially
@@ -40,13 +40,13 @@ final class ConvenienceStageTests: XCTestCase {
 
     func test_stageOne_doesNotDispose_onCallAtOtherLocation() async throws {
         var didFire = false
-        await AnyDisposable {
+        AnyDisposable {
             didFire = true
         }
         // Line A
         .stageOneByLocation()
         XCTAssertFalse(didFire)
-        await AnyDisposable {}
+        AnyDisposable {}
             // Line B
             .stageOneByLocation()
 
@@ -54,22 +54,6 @@ final class ConvenienceStageTests: XCTestCase {
         // and so separate stage keys, so A's disposable is
         // not called.
         XCTAssertFalse(didFire)
-    }
-
-    func test_stageOne_disposes_onRepeatCallAtSameLocation() async throws {
-        var didFire = false
-        func call() async  {
-            await AnyDisposable {
-                didFire = true
-            }
-            // This line is executed twice and the source
-            // code identity is used as the stage key.
-            .stageOneByLocation()
-        }
-        await call()
-        XCTAssertFalse(didFire)
-        await call()
-        XCTAssert(didFire)
     }
 
 }

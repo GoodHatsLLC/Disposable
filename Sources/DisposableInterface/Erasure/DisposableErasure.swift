@@ -1,11 +1,13 @@
 // MARK: - Disposable
 
+extension AsyncDisposable {
+    public func erase() -> AnyAsyncDisposable {
+        AnyAsyncDisposable { await dispose() }
+    }
+}
+
 extension Disposable {
     public func erase() -> AnyDisposable {
-        AnyDisposable { await dispose() }
-    }
-
-    public func eraseToDisposable() -> AnyDisposable {
-        erase()
+        AnyDisposable { dispose() }
     }
 }
