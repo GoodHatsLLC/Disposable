@@ -1,10 +1,12 @@
+--exclude Sources/AnyCodable
+
 # options
---swiftversion 5.6
+--swiftversion 5.7
 --self remove # redundantSelf
 --importgrouping testable-bottom # sortedImports
 --commas always # trailingCommas
 --trimwhitespace always # trailingSpace
---indent 4 #indent
+--indent 2 #indent
 --ifdef no-indent #indent
 --indentstrings true #indent
 --wraparguments before-first # wrapArguments
@@ -17,8 +19,8 @@
 --funcattributes prev-line # wrapAttributes
 --typeattributes prev-line # wrapAttributes
 --wrapternary before-operators # wrap
---structthreshold 20 # organizeDeclarations
---enumthreshold 20 # organizeDeclarations
+--structthreshold 30 # organizeDeclarations
+--enumthreshold 30 # organizeDeclarations
 --organizetypes class,struct,enum,extension,actor # organizeDeclarations
 --markcategories false #organizeDeclarations
 --extensionacl on-declarations # extensionAccessControl
