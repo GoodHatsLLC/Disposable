@@ -3,19 +3,16 @@ import Foundation
 
 // MARK: - DisposableStage
 
-public final class DisposableStage: Disposable {
+public final class DisposableStage: Disposable, @unchecked
+Sendable {
 
   nonisolated public init() {}
 
   deinit {
-    isDisposed = true
-    disposables = []
+    syncDispose()
   }
 
   public func stage(
-    fileID _: String = #fileID,
-    line _: Int = #line,
-    column _: Int = #column,
     _ disposable: some Disposable
   ) {
     if !isDisposed {
@@ -29,9 +26,14 @@ public final class DisposableStage: Disposable {
 
   /// End staged work and reset this stage to allow more.
   public func reset() {
+    lock.lock()
+
     isDisposed = false
     let syncCopy = disposables
     disposables.removeAll()
+
+    lock.unlock()
+
     for sync in syncCopy {
       sync.dispose()
     }
@@ -39,8 +41,11 @@ public final class DisposableStage: Disposable {
 
   private var isDisposed = false
   private var disposables: [AnyDisposable] = []
+  private let lock = NSLock()
 
   private func syncDispose() {
+    lock.lock()
+    defer { lock.unlock() }
     isDisposed = true
     let syncDisposables = disposables
     disposables.removeAll()
@@ -54,11 +59,8 @@ public final class DisposableStage: Disposable {
 extension Disposable {
 
   public func stage(
-    fileID: String = #fileID,
-    line: Int = #line,
-    column: Int = #column,
     on stage: DisposableStage
   ) {
-    stage.stage(fileID: fileID, line: line, column: column, self)
+    stage.stage(self)
   }
 }

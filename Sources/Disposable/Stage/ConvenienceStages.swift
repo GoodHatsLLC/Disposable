@@ -1,4 +1,5 @@
 import DisposableInterface
+import Foundation
 
 extension DisposableStage {
 
@@ -21,28 +22,27 @@ extension DisposableStage {
   }
 
   fileprivate static let indefinite = DisposableStage()
+  fileprivate static let identifiedLock = NSLock()
   fileprivate static var identifiedStage = [String: Disposable]()
 
 }
 
 extension Disposable {
   public func stageIndefinitely(
-    fileID: String = #fileID,
-    line: Int = #line,
-    column: Int = #column
   ) {
     stage(
-      fileID: fileID,
-      line: line,
-      column: column,
       on: DisposableStage.indefinite
     )
   }
 
   public func stageOne(by token: StaticString) {
     let token = "\(token)"
-    DisposableStage.identifiedStage[token]?.dispose()
+    let old: (any Disposable)?
+    DisposableStage.identifiedLock.lock()
+    old = DisposableStage.identifiedStage[token]
     DisposableStage.identifiedStage[token] = self
+    DisposableStage.identifiedLock.unlock()
+    old?.dispose()
   }
 
   public func stageOneByLocation(

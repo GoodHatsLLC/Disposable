@@ -13,7 +13,7 @@ let package = Package(
         "Disposable",
         "DisposableInterface",
       ]
-    )
+    ),
   ],
   dependencies: [
   ],
