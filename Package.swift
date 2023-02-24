@@ -13,14 +13,7 @@ let package = Package(
         "Disposable",
         "DisposableInterface",
       ]
-    ),
-    .library(
-      name: "DisposableAsync",
-      targets: [
-        "DisposableAsync",
-        "DisposableAsyncInterface",
-      ]
-    ),
+    )
   ],
   dependencies: [
   ],
@@ -30,15 +23,7 @@ let package = Package(
       dependencies: ["DisposableInterface"]
     ),
     .target(
-      name: "DisposableAsync",
-      dependencies: ["DisposableAsyncInterface"]
-    ),
-    .target(
       name: "DisposableInterface",
-      dependencies: []
-    ),
-    .target(
-      name: "DisposableAsyncInterface",
       dependencies: []
     ),
     .testTarget(
