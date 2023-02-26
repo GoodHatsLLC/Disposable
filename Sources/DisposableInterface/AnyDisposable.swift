@@ -1,8 +1,43 @@
+import Foundation
+
 // MARK: - AnyDisposable
 
-/// A type-erased `Disposable`.
-/// `AnyDisposable` triggers its disposalAction on `deinit`
-public final class AnyDisposable: Disposable {
+public struct AnyDisposable: Disposable, Sendable {
+
+  public func dispose() {
+    impl.dispose()
+  }
+
+  private let impl: AnyDisposableImpl
+  public init<D: Disposable>(_ disposable: D) {
+    if let any = disposable as? AnyDisposable {
+      self = any
+    } else {
+      impl = AnyDisposableImpl {
+        disposable.dispose()
+      }
+    }
+  }
+
+  public init(_ disposable: AnyDisposable) {
+    self = disposable
+  }
+
+  public init(_ disposalAction: @escaping () -> Void) {
+    impl = AnyDisposableImpl {
+      disposalAction()
+    }
+  }
+
+  public func erase() -> AnyDisposable {
+    self
+  }
+}
+
+// MARK: - AnyDisposableImpl
+
+private final class AnyDisposableImpl: @unchecked
+Sendable {
 
   public init(_ disposalAction: @escaping () -> Void) {
     self.disposalAction = disposalAction
@@ -13,32 +48,29 @@ public final class AnyDisposable: Disposable {
   }
 
   public func dispose() {
-    guard !isDisposed
-    else {
-      return
-    }
-    isDisposed = true
-    disposalAction()
+    let action = lock
+      .withLock {
+        let action = disposalAction
+        disposalAction = nil
+        return action
+      }
+    action?()
   }
 
-  public func erase() -> AnyDisposable {
-    self
-  }
-
-  private let disposalAction: () -> Void
-  private var isDisposed = false
+  private let lock = NSLock()
+  private var disposalAction: (() -> Void)?
 
 }
 
-// MARK: Hashable
+// MARK: - AnyDisposable + Hashable
 
 extension AnyDisposable: Hashable {
   nonisolated public static func == (lhs: AnyDisposable, rhs: AnyDisposable) -> Bool {
-    ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    ObjectIdentifier(lhs.impl) == ObjectIdentifier(rhs.impl)
   }
 
   nonisolated public func hash(into hasher: inout Hasher) {
-    hasher.combine(ObjectIdentifier(self))
+    hasher.combine(ObjectIdentifier(impl))
   }
 }
 

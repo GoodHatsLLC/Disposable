@@ -2,6 +2,6 @@
 
 extension Disposable {
   public func erase() -> AnyDisposable {
-    AnyDisposable { dispose() }
+    AnyDisposable(self)
   }
 }

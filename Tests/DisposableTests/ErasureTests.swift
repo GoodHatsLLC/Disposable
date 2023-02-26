@@ -34,6 +34,6 @@ final class ErasureTests: XCTestCase {
     // Erase should not change a pre-erased value.
     let anyDisposable = AnyDisposable {}.erase()
     let anyDisposable2 = anyDisposable.erase()
-    XCTAssert(anyDisposable === anyDisposable2)
+    XCTAssert(anyDisposable == anyDisposable2)
   }
 }

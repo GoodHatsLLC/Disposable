@@ -1,10 +1,10 @@
 import Disposable
 import XCTest
 
-// MARK: - DisposableTests
+// MARK: - BasicTests
 
 @MainActor
-final class DisposableTests: XCTestCase {
+final class BasicTests: XCTestCase {
 
   func test_disposable_firesOnDeinit() async throws {
     var didFire = false

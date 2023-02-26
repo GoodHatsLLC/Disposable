@@ -3,10 +3,9 @@ import XCTest
 
 // MARK: - ConvenienceStageTests
 
-@MainActor
 final class ConvenienceStageTests: XCTestCase {
 
-  func test_stageOne_disposesOnRestage() throws {
+  func test_stageOne_disposesOnRestage() async throws {
     var didFire = false
     AnyDisposable {
       didFire = true
