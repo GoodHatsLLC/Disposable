@@ -1,8 +1,8 @@
 # Disposable 🗑️
 
-A `Disposable` is an async oriented cancellation handler.  
-Disposables can represent handles to any long running behaviors like Combine `Cancellables` and Swift `Tasks`.  
-`Disposable` is used internally within the [https://github.com/GoodHatsLLC/StateTree](`StateTree` framework) and [https://github.com/GoodHatsLLC/Emitter](`Emitter` reactive streams library).
+A `Disposable` is a cancellation handler representing arbitrary long running work.
+
+This library is used in the [`Emitter`](https://github.com/GoodHatsLLC/Emitter) reactive streams library and internally within the [`StateTree`](https://github.com/GoodHatsLLC/StateTree) framework.
 
 ## Purpose
 
