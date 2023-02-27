@@ -7,7 +7,7 @@ import Combine
 final class CombineBridgeTests: XCTestCase {
 
   // This test just shows the other tests can actually work
-  func test_cancellable_doesNotCancelUnexpectedly() throws {
+  func test_cancellable_doesNotCancelUnexpectedly() async throws {
     var didFire = false
     let disposeStage = DisposableStage()
     AnyCancellable {
@@ -20,7 +20,8 @@ final class CombineBridgeTests: XCTestCase {
   }
 
   func test_cancellable_cancelsOnDeinit() throws {
-    var didFire = false {
+    var didFire = false
+    ({
       let disposeStage = DisposableStage()
       AnyCancellable {
         didFire = true
@@ -29,7 +30,7 @@ final class CombineBridgeTests: XCTestCase {
       .stage(on: disposeStage)
       XCTAssertFalse(didFire)
       XCTAssertNotNil(disposeStage)
-    }
+    })()
     XCTAssert(didFire)
   }
 
