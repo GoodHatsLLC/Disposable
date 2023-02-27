@@ -3,7 +3,6 @@ import XCTest
 
 // MARK: - ThreadingTests
 
-@MainActor
 final class ThreadingTests: XCTestCase {
 
   func test_anyDisposable_firesOnce() async throws {
@@ -63,24 +62,26 @@ final class ThreadingTests: XCTestCase {
 
     weak var weakStage: DisposableStage?
 
-    autoreleasepool {
+    ({
       let stage = DisposableStage()
       for _ in 0..<10_000 {
         AnyDisposable {
           count += 1
         }.stage(on: stage)
+
+        weakStage = stage
+        XCTAssertNotNil(weakStage)
+        XCTAssertEqual(count, 0)
       }
-      weakStage = stage
-      XCTAssertNotNil(weakStage)
-      XCTAssertEqual(count, 0)
-    }
+    })()
+
     XCTAssertNil(weakStage)
     XCTAssertEqual(count, 10_000)
   }
 
   func test_deinit_trigger() async throws {
     var count = 0
-    autoreleasepool {
+    ({
       var hashables = Set<AnyHashable>()
       for _ in 0..<10_000 {
         let disp = AnyDisposable {
@@ -89,7 +90,7 @@ final class ThreadingTests: XCTestCase {
         _ = hashables.insert(disp)
       }
       XCTAssertEqual(count, 0)
-    }
+    })()
 
     XCTAssertEqual(count, 10_000)
   }
@@ -102,7 +103,7 @@ final class ThreadingTests: XCTestCase {
     weak var weak1: Token?
     weak var weak2: Token?
     var disp2: AnyDisposable?
-    autoreleasepool {
+    ({
       let token1 = Token()
       let token2 = Token()
       weak1 = token1
@@ -117,7 +118,7 @@ final class ThreadingTests: XCTestCase {
         count += 1
         token2.thing()
       }
-    }
+    })()
 
     XCTAssertNotNil(weak2)
     XCTAssertNotNil(weak1)

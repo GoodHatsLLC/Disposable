@@ -4,7 +4,6 @@ import XCTest
 #if canImport(Combine)
 import Combine
 
-@MainActor
 final class CombineBridgeTests: XCTestCase {
 
   // This test just shows the other tests can actually work
@@ -21,8 +20,7 @@ final class CombineBridgeTests: XCTestCase {
   }
 
   func test_cancellable_cancelsOnDeinit() throws {
-    var didFire = false
-    autoreleasepool {
+    var didFire = false {
       let disposeStage = DisposableStage()
       AnyCancellable {
         didFire = true

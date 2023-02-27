@@ -3,7 +3,6 @@ import XCTest
 
 // MARK: - TaskBridgeTests
 
-@MainActor
 final class TaskBridgeTests: XCTestCase {
 
   func test_task_cancelsOnDispose() async throws {
@@ -23,10 +22,11 @@ final class TaskBridgeTests: XCTestCase {
   }
 
   // This test shows the cancelsOnDeinit can work
+  @MainActor
   func test_task_spinsAcrossFlush() async throws {
     var didFire = false
     let disposeStage = DisposableStage()
-    Task {
+    Task { @MainActor in
       while true {
         await Task.yield()
         if Task.isCancelled {
@@ -42,11 +42,12 @@ final class TaskBridgeTests: XCTestCase {
     XCTAssertFalse(didFire)
   }
 
+  @MainActor
   func test_task_cancelsOnDeinit() async throws {
     var didFire = false
-    autoreleasepool {
+    ({
       let disposeStage = DisposableStage()
-      Task {
+      Task { @MainActor in
         while true {
           await Task.yield()
           if Task.isCancelled {
@@ -58,7 +59,7 @@ final class TaskBridgeTests: XCTestCase {
       .stage(on: disposeStage)
       XCTAssertFalse(didFire)
       XCTAssertNotNil(disposeStage)
-    }
+    })()
     await Task.flush()
     XCTAssert(didFire)
   }
@@ -67,7 +68,7 @@ final class TaskBridgeTests: XCTestCase {
 extension Task where Failure == Never, Success == Void {
   static func flush(count: Int = 25) async {
     for _ in 0..<count {
-      _ = await Task<Void, Error> { try await Task<Never, Never>.sleep(nanoseconds: 1 * USEC_PER_SEC) }.result
+      _ = await Task<Void, Error> { try await Task<Never, Never>.sleep(nanoseconds: 1_000_000) }.result
     }
   }
 }
