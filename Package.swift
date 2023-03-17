@@ -11,7 +11,6 @@ let package = Package(
       name: "Disposable",
       targets: [
         "Disposable",
-        "DisposableInterface",
       ]
     ),
   ],
@@ -19,12 +18,7 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "Disposable",
-      dependencies: ["DisposableInterface"]
-    ),
-    .target(
-      name: "DisposableInterface",
-      dependencies: []
+      name: "Disposable"
     ),
     .testTarget(
       name: "DisposableTests",

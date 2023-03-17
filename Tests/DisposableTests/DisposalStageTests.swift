@@ -7,14 +7,16 @@ final class DisposalStageTests: XCTestCase {
 
   func test_disposalStage_abortsOnDeinit() throws {
     var didFire = false
-    ({
+    let run = {
       let disposeStage = DisposableStage()
       AnyDisposable {
         didFire = true
       }.stage(on: disposeStage)
       XCTAssertFalse(didFire)
       XCTAssertNotNil(disposeStage)
-    })()
+    }
+    run()
+
     XCTAssert(didFire)
   }
 

@@ -13,7 +13,7 @@ final class ConvenienceStageTests: XCTestCase {
     .stageOne(by: "LOL")
     XCTAssertFalse(didFire)
 
-    AnyDisposable {}.stageOne(by: "LOL")
+    AnyDisposable { }.stageOne(by: "LOL")
 
     // The two stage keys are the same so the second
     // staged disposable replaces the first and the first
@@ -29,7 +29,7 @@ final class ConvenienceStageTests: XCTestCase {
     .stageOne(by: "LOL")
 
     XCTAssertFalse(didFire)
-    AnyDisposable {}
+    AnyDisposable { }
       .stageOne(by: "ROFL")
 
     // The two stage keys are different so the initially
@@ -45,7 +45,7 @@ final class ConvenienceStageTests: XCTestCase {
     // Line A
     .stageOneByLocation()
     XCTAssertFalse(didFire)
-    AnyDisposable {}
+    AnyDisposable { }
       // Line B
       .stageOneByLocation()
 

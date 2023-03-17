@@ -1,7 +1,9 @@
-import DisposableInterface
+
 import Foundation
 
 extension DisposableStage {
+
+  // MARK: Public
 
   public static func resetIndefinite() {
     indefinite.reset()
@@ -20,6 +22,8 @@ extension DisposableStage {
       .removeValue(forKey: "\(identified)")?
       .dispose()
   }
+
+  // MARK: Fileprivate
 
   fileprivate static let indefinite = DisposableStage()
   fileprivate static let identifiedLock = NSLock()

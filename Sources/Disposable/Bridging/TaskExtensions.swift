@@ -1,7 +1,8 @@
-import DisposableInterface
 
-extension Task {
-  public func erase() -> AnyDisposable {
-    AnyDisposable { self.cancel() }
+extension AnyDisposable {
+  public init(_ task: Task<some Any, some Any>) {
+    self.init {
+      task.cancel()
+    }
   }
 }

@@ -7,14 +7,16 @@ final class BasicTests: XCTestCase {
 
   func test_disposable_firesOnDeinit() async throws {
     var didFire = false
-    ({
+    let run = {
       let disposable = AnyDisposable {
         didFire = true
       }
       XCTAssertFalse(didFire)
       XCTAssertNotNil(disposable)
-    })()
-    await Task.flush()
+    }
+    run()
+
+    await Flush.tasks()
     XCTAssert(didFire)
   }
 
