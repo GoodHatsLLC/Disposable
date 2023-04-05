@@ -22,7 +22,7 @@ extension Disposables {
       mode: Mode,
       priority: TaskPriority? = nil,
       action: @escaping @Sendable () async -> Success,
-      onDispose: @escaping @Sendable () -> Void
+      onDispose: @escaping @Sendable () -> Void = { }
     ) where Failure == Never {
       let disposable = ErasedDisposable(disposal: onDispose)
       self.disposable = disposable
@@ -43,7 +43,7 @@ extension Disposables {
       mode: Mode,
       priority: TaskPriority? = nil,
       action: @escaping @Sendable () async throws -> Success,
-      onDispose: @escaping @Sendable () -> Void
+      onDispose: @escaping @Sendable () -> Void = { }
     ) where Failure == any Error {
       let action = {
         try SwiftTask.checkCancellation()
@@ -110,7 +110,7 @@ extension Disposables {
     public static func attached(
       priority: TaskPriority? = nil,
       action: @escaping @Sendable () async -> Success,
-      onDispose: @escaping @Sendable () -> Void
+      onDispose: @escaping @Sendable () -> Void = { }
     ) -> Task<Success, Failure> where Failure == Never {
       .init(mode: .attached, priority: priority, action: action, onDispose: onDispose)
     }
@@ -127,7 +127,7 @@ extension Disposables {
     public static func attached(
       priority: TaskPriority? = nil,
       action: @escaping @Sendable () async throws -> Success,
-      onDispose: @escaping @Sendable () -> Void
+      onDispose: @escaping @Sendable () -> Void = { }
     ) -> Task<Success, Failure> where Failure == any Error {
       .init(mode: .attached, priority: priority, action: action, onDispose: onDispose)
     }
@@ -145,7 +145,7 @@ extension Disposables {
     public static func detached(
       priority: TaskPriority? = nil,
       action: @escaping @Sendable () async -> Success,
-      onDispose: @escaping @Sendable () -> Void
+      onDispose: @escaping @Sendable () -> Void = { }
     ) -> Task<Success, Failure> where Failure == Never {
       .init(mode: .detached, priority: priority, action: action, onDispose: onDispose)
     }
@@ -164,7 +164,7 @@ extension Disposables {
     public static func detached(
       priority: TaskPriority? = nil,
       action: @escaping @Sendable () async throws -> Success,
-      onDispose: @escaping @Sendable () -> Void
+      onDispose: @escaping @Sendable () -> Void = { }
     ) -> Task<Success, Failure> where Failure == any Error {
       .init(mode: .detached, priority: priority, action: action, onDispose: onDispose)
     }

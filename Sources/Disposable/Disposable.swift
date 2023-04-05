@@ -44,11 +44,6 @@ extension Disposable where Self == AutoDisposable {
   public func erased() -> ErasedDisposable {
     ErasedDisposable(self)
   }
-
-  public func take() -> ErasedDisposable {
-    take()
-    return ErasedDisposable(self)
-  }
 }
 
 extension Disposable where Self == ErasedDisposable {
