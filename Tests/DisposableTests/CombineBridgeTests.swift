@@ -11,7 +11,7 @@ final class CombineBridgeTests: XCTestCase {
     var didFire = false
     let disposeStage = DisposableStage()
 
-    AnyDisposable.make {
+    Disposables.make {
       AnyCancellable {
         didFire = true
       }
@@ -26,7 +26,7 @@ final class CombineBridgeTests: XCTestCase {
 
     let run = {
       let disposeStage = DisposableStage()
-      AnyDisposable.make {
+      Disposables.make {
         AnyCancellable {
           didFire = true
         }
@@ -42,7 +42,7 @@ final class CombineBridgeTests: XCTestCase {
   func test_builder_cancellable_cancelsOnDispose() throws {
     var didFire = 0
     let disposeStage = DisposableStage()
-    AnyDisposable.make {
+    Disposables.make {
       AnyCancellable {
         didFire += 1
       }
@@ -70,7 +70,7 @@ final class CombineBridgeTests: XCTestCase {
   func test_cancellable_cancelsOnDispose() throws {
     var didFire = false
     let disposeStage = DisposableStage()
-    AnyDisposable(
+    ErasedDisposable(
       AnyCancellable {
         didFire = true
       }

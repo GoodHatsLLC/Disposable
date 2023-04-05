@@ -12,8 +12,7 @@ final class TaskBridgeTests: XCTestCase {
         await Task.yield()
       }
     }
-    AnyDisposable
-      .make { task }
+    Disposables.make { task }
       .stage(on: disposeStage)
 
     XCTAssertFalse(task.isCancelled)
@@ -27,20 +26,19 @@ final class TaskBridgeTests: XCTestCase {
     let disposeStage = DisposableStage()
     var didExecute = false
     let isCancelled = Locked<Bool>(false)
-    AnyDisposable
-      .make {
-        Task { @MainActor in
-          await withTaskCancellationHandler {
-            didExecute = true
-            while true {
-              await Task.yield()
-            }
-          } onCancel: {
-            isCancelled.value = true
+    Disposables.make {
+      Task { @MainActor in
+        await withTaskCancellationHandler {
+          didExecute = true
+          while true {
+            await Task.yield()
           }
+        } onCancel: {
+          isCancelled.value = true
         }
       }
-      .stage(on: disposeStage)
+    }
+    .stage(on: disposeStage)
 
     await Flush.tasks(count: 100)
     XCTAssert(didExecute)
@@ -56,7 +54,7 @@ final class TaskBridgeTests: XCTestCase {
     let disposeStage = DisposableStage()
     var didExecute = false
     let isCancelled = Locked<Bool>(false)
-    AnyDisposable(
+    Disposables.make {
       Task { @MainActor in
         await withTaskCancellationHandler {
           didExecute = true
@@ -67,7 +65,7 @@ final class TaskBridgeTests: XCTestCase {
           isCancelled.value = true
         }
       }
-    )
+    }
     .stage(on: disposeStage)
 
     await Flush.tasks(count: 100)
@@ -92,8 +90,7 @@ final class TaskBridgeTests: XCTestCase {
         }
       }
     }
-    AnyDisposable
-      .make { task }
+    Disposables.make { task }
       .stage(on: disposeStage)
     XCTAssertFalse(didFire)
     XCTAssertNotNil(disposeStage)
@@ -114,7 +111,7 @@ final class TaskBridgeTests: XCTestCase {
           }
         }
       }
-      AnyDisposable
+      Disposables
         .make { task }
         .stage(on: disposeStage)
       XCTAssertFalse(didFire)

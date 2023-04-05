@@ -17,13 +17,56 @@
 /// can be safely used in a `nonisolated` context.
 public protocol Disposable {
   nonisolated func dispose()
-  nonisolated func erase() -> AnyDisposable
+  nonisolated func auto() -> AutoDisposable
+  nonisolated var isDisposed: Bool { get }
 }
 
 // MARK: - Disposable
 
 extension Disposable {
-  public func erase() -> AnyDisposable {
-    AnyDisposable(self)
+
+  /// Erase the disposable to an ``AutoDisposable`` which disposes
+  /// when it goes out of scope.
+  public func auto() -> AutoDisposable {
+    AutoDisposable(self)
+  }
+
+  public func erased() -> ErasedDisposable {
+    ErasedDisposable(self)
+  }
+}
+
+extension Disposable where Self == AutoDisposable {
+  public func auto() -> AutoDisposable {
+    AutoDisposable(self)
+  }
+
+  public func erased() -> ErasedDisposable {
+    ErasedDisposable(self)
+  }
+
+  public func take() -> ErasedDisposable {
+    take()
+    return ErasedDisposable(self)
+  }
+}
+
+extension Disposable where Self == ErasedDisposable {
+  public func auto() -> AutoDisposable {
+    AutoDisposable(self)
+  }
+
+  public func erased() -> ErasedDisposable {
+    ErasedDisposable(self)
+  }
+}
+
+// MARK: - Disposables
+
+public enum Disposables { }
+
+extension Disposables {
+  public static func make(@DisposableBuilder builder: () -> ErasedDisposable) -> ErasedDisposable {
+    builder()
   }
 }

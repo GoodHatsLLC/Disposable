@@ -6,55 +6,55 @@ import Combine
 
 @resultBuilder
 public enum DisposableBuilder {
-  public static func buildExpression(_ disposable: some Disposable) -> [AnyDisposable] {
-    [AnyDisposable(disposable)]
+  public static func buildExpression(_ disposable: some Disposable) -> [ErasedDisposable] {
+    [ErasedDisposable(disposable)]
   }
 
   #if canImport(Combine)
-  public static func buildExpression(_ cancellable: some Cancellable) -> [AnyDisposable] {
-    [AnyDisposable(cancellable)]
+  public static func buildExpression(_ cancellable: some Cancellable) -> [ErasedDisposable] {
+    [ErasedDisposable(cancellable)]
   }
 
-  public static func buildExpression(_ cancellables: [any Cancellable]) -> [AnyDisposable] {
-    cancellables.map { AnyDisposable($0) }
+  public static func buildExpression(_ cancellables: [any Cancellable]) -> [ErasedDisposable] {
+    cancellables.map { ErasedDisposable($0) }
   }
   #endif
 
-  public static func buildExpression(_: ()) -> [AnyDisposable] {
+  public static func buildExpression(_: ()) -> [ErasedDisposable] {
     []
   }
 
-  public static func buildExpression(_ task: Task<some Any, some Any>) -> [AnyDisposable] {
-    [AnyDisposable(task)]
+  public static func buildExpression(_ task: Task<some Any, some Any>) -> [ErasedDisposable] {
+    [ErasedDisposable(task)]
   }
 
-  public static func buildExpression(_ tasks: [Task<some Any, some Any>]) -> [AnyDisposable] {
-    tasks.map { AnyDisposable($0) }
+  public static func buildExpression(_ tasks: [Task<some Any, some Any>]) -> [ErasedDisposable] {
+    tasks.map { ErasedDisposable($0) }
   }
 
   public static func buildPartialBlock(
-    accumulated: [AnyDisposable],
-    next: [AnyDisposable]
-  ) -> [AnyDisposable] {
+    accumulated: [ErasedDisposable],
+    next: [ErasedDisposable]
+  ) -> [ErasedDisposable] {
     accumulated + next
   }
 
-  public static func buildOptional(_ component: [AnyDisposable]?) -> [AnyDisposable] {
+  public static func buildOptional(_ component: [ErasedDisposable]?) -> [ErasedDisposable] {
     component ?? []
   }
 
-  public static func buildBlock(_ disposables: [AnyDisposable] ...) -> [AnyDisposable] {
+  public static func buildBlock(_ disposables: [ErasedDisposable] ...) -> [ErasedDisposable] {
     disposables.flatMap { $0 }
   }
 
-  public static func buildArray(_ components: [[AnyDisposable]]) -> [AnyDisposable] {
+  public static func buildArray(_ components: [[ErasedDisposable]]) -> [ErasedDisposable] {
     components.flatMap { $0 }
   }
 
-  public static func buildFinalResult(_ disposables: [AnyDisposable])
-    -> AnyDisposable
+  public static func buildFinalResult(_ disposables: [ErasedDisposable])
+    -> ErasedDisposable
   {
-    AnyDisposable(disposal: {
+    ErasedDisposable(disposal: {
       for disposable in disposables {
         disposable.dispose()
       }

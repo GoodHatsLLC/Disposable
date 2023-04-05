@@ -8,7 +8,7 @@ final class BasicTests: XCTestCase {
   func test_disposable_firesOnDeinit() async throws {
     var didFire = false
     let run = {
-      let disposable = AnyDisposable {
+      let disposable = AutoDisposable {
         didFire = true
       }
       XCTAssertFalse(didFire)
@@ -22,7 +22,7 @@ final class BasicTests: XCTestCase {
 
   func test_disposable_firesOnDispose() async throws {
     var didFire = false
-    let disposable = AnyDisposable {
+    let disposable = AutoDisposable {
       didFire = true
     }
     XCTAssertFalse(didFire)

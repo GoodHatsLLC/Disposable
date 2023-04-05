@@ -1,45 +1,110 @@
 // MARK: - Locked
 
-struct Locked<T>: LockedValue {
+/// A lock wrapper which protects an instance of its generic `T` type with
+/// the best available **general purpose**, **non-recursive**, lock available
+/// to the platform.
+///
+/// Use `Locked` only if details of the underlying lock implementation are non-critical.
+///
+/// > Info: The current implementation prefers locks as follows:
+/// 1. `OSAllocatedUnfairLock`
+/// 2. `NSLock`
+/// 3. `pthread_mutex_t`
+struct Locked<T> {
 
   // MARK: Lifecycle
 
+  /// Create a non-recursive``Locked`` protecting the given instance of `T`.
+  ///
+  /// - Parameters:
+  ///   - value: the instance to be protected by the lock.
+  @inline(__always)
   init(_ value: T) {
-    let lock = Self.make(for: value)
-    self.underlying = lock
-    self.withLockImpl = { act in
-      lock.lock()
-      defer { lock.unlock() }
-      return act(&lock.unsafe_wrapped)
-    }
+    self.underlying = Self.make(for: value)
+  }
+
+  /// Create a non-recursive ``Locked`` that doesn't protect an instance
+  /// but instead provides lower level ``lock()`` and ``unlock()`` access.
+  ///
+  /// - Parameters:
+  ///   - value: the instance to be protected by the lock.
+  @inline(__always)
+  init() where T == Void {
+    self.underlying = Self.make(for: ())
   }
 
   // MARK: Internal
 
-  var value: T {
+  /// Exclusive `{ get set }` access to the protected value.
+  ///
+  /// > Note: Use ``withLock(action:)-7qgic`` for atomic
+  /// read-evaluate-write access to the underlying variable.
+  @inline(__always) var value: T {
     get {
       withLock { $0 }
     }
     nonmutating _modify {
-      underlying.lock()
-      yield &underlying.unsafe_wrapped
-      underlying.unlock()
+      let lock = underlying
+      lock.lock()
+      yield &lock.unsafe_wrapped
+      lock.unlock()
     }
     nonmutating set {
       withLock { $0 = newValue }
     }
   }
 
+  /// Take exclusive read-write access to the underlying protected `T` instance returning
+  /// any value it returns
+  ///
+  /// - Parameters:
+  ///   - action: A closure accepting an `inout` instance of `T` and optionally returning a value of
+  /// `aT`.
+  /// - Returns: The instance of `aT` created by the action.
+  @inline(__always)
   @discardableResult
-  func withLock<aT>(_ act: (inout T) -> aT) -> aT {
-    withLockImpl(act) as! aT
+  func withLock<aT>(action: (inout T) throws -> aT) rethrows -> aT {
+    let lock = underlying
+    lock.lock()
+    defer { lock.unlock() }
+    return try action(&lock.unsafe_wrapped)
   }
 
   // MARK: Private
 
-  private let withLockImpl: ((inout T) -> Any) -> Any
   private let underlying: any LockType<T>
+}
 
+extension Locked where T == Void {
+  /// Take exclusive access to the lock while executing the passed closure returning
+  /// any value it returns.
+  ///
+  /// - Parameters:
+  ///   - action: A closure accepting an `inout` instance of `T` and optionally returning a value of
+  /// `aT`.
+  /// - Returns: The instance of `aT` created by the action.
+  @inline(__always)
+  @discardableResult
+  func withLock<P>(action: () throws -> P) rethrows -> P {
+    let lock = underlying
+    lock.lock()
+    defer { lock.unlock() }
+    return try action()
+  }
+
+  /// Take exclusive access to the lock.
+  ///
+  /// Prefer ``withLock(action:)-7ntrz``.
+  @inline(__always)
+  func lock() {
+    underlying.lock()
+  }
+
+  /// Release exclusive access taken with ``lock()``
+  @inline(__always)
+  func unlock() {
+    underlying.unlock()
+  }
 }
 
 // MARK: Sendable
@@ -63,15 +128,6 @@ extension Locked {
   }
 }
 
-// MARK: - LockedValue
-
-private protocol LockedValue<T> {
-  associatedtype T
-  @discardableResult
-  init(_: T)
-  func withLock<aT>(_: (inout T) -> aT) -> aT
-}
-
 // MARK: - LockType
 
 private protocol LockType<T>: AnyObject {
@@ -80,7 +136,7 @@ private protocol LockType<T>: AnyObject {
   func lock()
   @inline(__always)
   func unlock()
-  var unsafe_wrapped: T { get set }
+  @inline(__always) var unsafe_wrapped: T { get set }
 }
 
 #if canImport(Foundation)
@@ -89,6 +145,7 @@ private final class NSLocked<T>: LockType {
 
   // MARK: Lifecycle
 
+  @inline(__always)
   fileprivate init(_ value: T) {
     self.unsafe_wrapped = value
   }
@@ -120,6 +177,7 @@ private final class OSUnfairLocked<T>: LockType {
 
   // MARK: Lifecycle
 
+  @inline(__always)
   fileprivate init(_ value: T) {
     self.oslock = .init(initialState: ())
     self.unsafe_wrapped = value
@@ -151,6 +209,7 @@ private final class PThreadLock<T>: LockType {
 
   // MARK: Lifecycle
 
+  @inline(__always)
   fileprivate init(_ value: T) {
     self.unsafe_wrapped = value
   }
