@@ -10,7 +10,7 @@
 /// 1. `OSAllocatedUnfairLock`
 /// 2. `NSLock`
 /// 3. `pthread_mutex_t`
-struct Locked<T> {
+public struct Locked<T> {
 
   // MARK: Lifecycle
 
@@ -19,7 +19,7 @@ struct Locked<T> {
   /// - Parameters:
   ///   - value: the instance to be protected by the lock.
   @inline(__always)
-  init(_ value: T) {
+  public init(_ value: T) {
     self.underlying = Self.make(for: value)
   }
 
@@ -29,17 +29,17 @@ struct Locked<T> {
   /// - Parameters:
   ///   - value: the instance to be protected by the lock.
   @inline(__always)
-  init() where T == Void {
+  public init() where T == Void {
     self.underlying = Self.make(for: ())
   }
 
-  // MARK: Internal
+  // MARK: Public
 
   /// Exclusive `{ get set }` access to the protected value.
   ///
   /// > Note: Use ``withLock(action:)-7qgic`` for atomic
   /// read-evaluate-write access to the underlying variable.
-  @inline(__always) var value: T {
+  @inline(__always) public var value: T {
     get {
       withLock { $0 }
     }
@@ -63,7 +63,7 @@ struct Locked<T> {
   /// - Returns: The instance of `aT` created by the action.
   @inline(__always)
   @discardableResult
-  func withLock<aT>(action: (inout T) throws -> aT) rethrows -> aT {
+  public func withLock<aT>(action: (inout T) throws -> aT) rethrows -> aT {
     let lock = underlying
     lock.lock()
     defer { lock.unlock() }
@@ -85,7 +85,7 @@ extension Locked where T == Void {
   /// - Returns: The instance of `aT` created by the action.
   @inline(__always)
   @discardableResult
-  func withLock<P>(action: () throws -> P) rethrows -> P {
+  public func withLock<P>(action: () throws -> P) rethrows -> P {
     let lock = underlying
     lock.lock()
     defer { lock.unlock() }
@@ -96,13 +96,13 @@ extension Locked where T == Void {
   ///
   /// Prefer ``withLock(action:)-7ntrz``.
   @inline(__always)
-  func lock() {
+  public func lock() {
     underlying.lock()
   }
 
   /// Release exclusive access taken with ``lock()``
   @inline(__always)
-  func unlock() {
+  public func unlock() {
     underlying.unlock()
   }
 }
@@ -115,7 +115,7 @@ extension Locked {
   @inline(__always)
   fileprivate static func make(for value: T) -> some LockType<T> {
     #if canImport(os)
-    if #available(iOS 16, macOS 13, *) {
+    if #available(iOS 16, macOS 13, tvOS 16, macCatalyst 16, watchOS 9, *) {
       return OSUnfairLocked(value)
     } else {
       return NSLocked(value)

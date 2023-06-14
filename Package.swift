@@ -4,7 +4,13 @@ import PackageDescription
 
 let package = Package(
   name: "Disposable",
-  platforms: [.macOS(.v10_15), .iOS(.v14)],
+  platforms: [
+    .macOS("12.3"),
+    .iOS("15.4"),
+    .tvOS("15.4"),
+    .watchOS("8.5"),
+    .macCatalyst("15.4"),
+  ],
   products: [
     .library(
       name: "Disposable",
