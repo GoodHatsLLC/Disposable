@@ -62,8 +62,8 @@ extension Disposables.stages {
   // MARK: Fileprivate
 
   fileprivate static let indefinite = DisposableStage()
-  fileprivate static var identifiedStage = Locked([String: Disposable]())
-  fileprivate static var callSiteStage = Locked([String: Disposable]())
+  fileprivate static var identifiedStage = Locked([String: any Disposable]())
+  fileprivate static var callSiteStage = Locked([String: any Disposable]())
 
 }
 

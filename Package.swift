@@ -23,7 +23,9 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "Disposable"
+      name: "Disposable",
+      dependencies: [],
+      swiftSettings: Env.swiftSettings
     ),
     .testTarget(
       name: "DisposableTests",
@@ -31,3 +33,19 @@ let package = Package(
     ),
   ]
 )
+
+// MARK: - Env
+
+private enum Env {
+  static let swiftSettings: [SwiftSetting] = {
+    var settings: [SwiftSetting] = []
+    settings.append(contentsOf: [
+      .enableUpcomingFeature("ConciseMagicFile"),
+      .enableUpcomingFeature("ExistentialAny"),
+      .enableUpcomingFeature("StrictConcurrency"),
+      .enableUpcomingFeature("ImplicitOpenExistentials"),
+      .enableUpcomingFeature("BareSlashRegexLiterals"),
+    ])
+    return settings
+  }()
+}
