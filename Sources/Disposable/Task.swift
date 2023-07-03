@@ -10,8 +10,8 @@ extension Disposables {
   /// A wrapped for Swift's native `Task` which implements `Disposable`.
   ///
   /// Create a *running* wrapped `Task` with
-  /// ``Disposables/Task/attached(priority:action:onDispose:)-7m9sh``
-  /// or ``Disposables/Task/attached(priority:action:onDispose:)-7m9sh``.
+  /// ``Disposables/Task/attached(priority:action:onDispose:)-5ejvn``
+  /// or ``Disposables/Task/attached(priority:action:onDispose:)-3kr88``.
   public struct Task<Success, Failure>: Disposable, Sendable where Success: Sendable,
     Failure: Error
   {

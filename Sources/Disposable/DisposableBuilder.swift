@@ -1,7 +1,3 @@
-#if canImport(Combine)
-import Combine
-#endif
-
 // MARK: - DisposableBuilder
 
 @resultBuilder
@@ -9,16 +5,6 @@ public enum DisposableBuilder {
   public static func buildExpression(_ disposable: some Disposable) -> [ErasedDisposable] {
     [ErasedDisposable(disposable)]
   }
-
-  #if canImport(Combine)
-  public static func buildExpression(_ cancellable: some Cancellable) -> [ErasedDisposable] {
-    [ErasedDisposable(cancellable)]
-  }
-
-  public static func buildExpression(_ cancellables: [any Cancellable]) -> [ErasedDisposable] {
-    cancellables.map { ErasedDisposable($0) }
-  }
-  #endif
 
   public static func buildExpression(_: ()) -> [ErasedDisposable] {
     []
